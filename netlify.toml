@@ -1,0 +1,3 @@
+[build]
+  command = "node scripts/verify-static-assets.mjs"
+  publish = "."
