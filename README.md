@@ -10,13 +10,21 @@ Two standalone, buildless ES module dashboard concepts for the FreeSun balloon c
 - `assets/`: Esri World Imagery tiles and the original balloon illustration.
 - `master-template.html` and `hud-master-template.html`: the two concept page scaffolds.
 
-Serve the repository root with any static HTTP server. There is no build step or application dependency. Fonts load from Google Fonts with local sans-serif fallbacks.
+Serve the repository root with any static HTTP server. There is no build step. The Supabase client is loaded as an ES module from esm.sh; fonts load from Google Fonts with local sans-serif fallbacks.
 
 ## Functional scope
 
 Concept switch; theme persistence; map pan, zoom, recenter, route/label layers; perspective tilt; simulated balloon replay; replay scrubber; crew history and role profiles; demo flight schedule and local RSVP; saved checklist; local flight notes; validated WhatsApp invite-link storage/open; local breakfast tally and original Bacon Tracker link.
 
-This prototype does not connect live GPS, crew identity, real flight records, WhatsApp messages, or current weather. All operational data is explicitly sample data. Perspective is a tilt of 2D imagery, not actual terrain elevation. Local actions do not update a shared crew database.
+Crew profiles, upcoming schedule items, flight summaries, and balloon records read from the authenticated FreeSun Supabase project. Sign in uses magic links for existing crew accounts. The map route and telemetry, weather, WhatsApp, checklist, RSVP, personal flight notes, and Bacon Tracker remain demo/local features; no operational decision should use simulated values. Perspective is a tilt of 2D imagery, not actual terrain elevation. Local actions do not update a shared crew database.
+
+## Supabase connection
+
+- Project: `FreeSun` (`hvfpiemdlredzgcsxlzx`, `us-west-2`).
+- `supabase-client.js` uses the project URL and its publishable key. No service-role or secret key is present in the browser bundle.
+- `supabase/migrations/20261017200347_flight_deck_authenticated_views.sql` creates read-only, authenticated-only views for the fields used in the dashboard. Crew email/phone, personal URLs, flight notes, and attachments are excluded.
+- Add `https://deploy-preview-1--freesun-flight-deck.netlify.app/**` to **Authentication → URL Configuration → Redirect URLs** in Supabase before using email sign-in on the deploy preview. Add the final site origin there when production is configured.
+- Sign-in is restricted to existing users (`shouldCreateUser: false`). New account provisioning is outside this prototype.
 
 ## Sources
 
@@ -28,7 +36,7 @@ This prototype does not connect live GPS, crew identity, real flight records, Wh
 
 ## Design checkpoint
 
-Preserve ivory/pine/sage/clay colors, compact Manrope/DM Sans typography, 17px cards, 17px grid gaps, rail navigation, shared cards, and concept-specific map layout. No external backend credentials or private crew information are included.
+Preserve ivory/pine/sage/clay colors, compact Manrope/DM Sans typography, 17px cards, 17px grid gaps, rail navigation, shared cards, and concept-specific map layout. Do not add service-role credentials or private crew information to the public repository. The browser uses the publishable key with authenticated-only views.
 
 MapTracker preserves the bento composition. HudOverlay uses an independent full-screen map shell, floating mission and flight instruments, and bottom crew dock with collapsible panels. Both retain the same palette, typography, domain components, local storage, and interaction handlers. Direct pages declare their concept in `data-concept`; old query links remain supported.
 
